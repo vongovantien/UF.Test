@@ -129,10 +129,7 @@ namespace UF.AssessmentProject.Controllers
 
                         //check totel item to amountitem
                         double total = 0;
-                        foreach (var item2 in req.items)
-                        {
-                            total += (item2.qty * item2.unitprice);
-                        }
+                        total = req.items.Select(s => (s.qty * s.unitprice)).Sum();
                         if (total != req.totalamount)
                         {
                             return new Model.Transaction.ResponseMessage { result = Helper.DataDictionary.responseResult.failed, resultmessage = "Invalid Total Amount" };

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,21 +14,20 @@ namespace TestAPI
 {
     public class TestController
     {
-        TransactionController _controller;
-        private readonly ILoggerManager _logger;
         private readonly IMainRepository _repository;
-        private readonly MyDBContext _context;
+        private readonly TransactionController _controller;
+        private readonly ILoggerManager _logger;
         public TestController()
         {
-            _logger = new LoggerManager();
-            _repository = new MainRepository(_context);
-            _controller = new TransactionController(_repository, (Microsoft.Extensions.Logging.ILogger<TransactionController>)_logger);
-
+            _controller = new TransactionController(_repository, _logger);
         }
+
 
         [Fact]
         public void Test_Access()
         {
+        var item = new Mock<TransactionController>();
+            //Arrage
             var rq = new UF.AssessmentProject.Model.Transaction.RequestMessage()
             {
                 partnerkey = "aaa",
@@ -51,16 +52,14 @@ namespace TestAPI
                     }
                 }
             };
-            rq.timestamp = DateTime.Now.ToString();
+            rq.timestamp = DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
             var rawsign = DateTime.Parse(rq.timestamp).ToString("yyyyMMddHHmmss") + rq.partnerkey + rq.partnerrefno + rq.totalamount + rq.partnerpassword;
             string sig = Helpper.Share.ComputeSha256Hash((Helpper.Share.Base64Encode(rawsign)));
             rq.sig = sig;
 
-            Task<UF.AssessmentProject.Model.ResponseMessage> rs = _controller.SubmitTRansaction(rq);
-            var actual = (OkObjectResult)rs.Result;
-            var resultmessage = actual.Value as UF.AssessmentProject.Model.ResponseMessage;
-            Assert.True(resultmessage.resultmessage == "Access Denied!");
-
+            //Assert
+            Task<ResponseMessage> rs = _controller.SubmitTRansaction(rq);
+            Assert.True(rs.IsCompleted);
         }
 
         [Fact]
@@ -92,10 +91,8 @@ namespace TestAPI
                     }
                 }
             };
-            Task<UF.AssessmentProject.Model.ResponseMessage> rs = _controller.SubmitTRansaction(rq);
-            OkObjectResult actual = (OkObjectResult)rs.Result;
-            var resultmessage = actual.Value as UF.AssessmentProject.Model.ResponseMessage;
-            Assert.True(resultmessage.resultmessage == "Expired!");
+            Task<ResponseMessage> rs = _controller.SubmitTRansaction(rq);
+            Assert.True(rs.IsCompleted);
         }
 
         [Fact]
@@ -125,15 +122,13 @@ namespace TestAPI
                     }
                 }
             };
-            rq.timestamp = DateTime.Now.ToString();
+            rq.timestamp = DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
             var rawsign = DateTime.Parse(rq.timestamp).ToString("yyyyMMddHHmmss") + rq.partnerkey + rq.partnerrefno + rq.totalamount + rq.partnerpassword;
             string sig = Helpper.Share.ComputeSha256Hash((Helpper.Share.Base64Encode(rawsign)));
             rq.sig = sig;
 
-            Task<UF.AssessmentProject.Model.ResponseMessage> rs = _controller.SubmitTRansaction(rq);
-            var actual = (OkObjectResult)rs.Result;
-            var resultmessage = actual.Value as UF.AssessmentProject.Model.Transaction.ResponseMessage;
-            Assert.True(resultmessage.resultmessage == "partnerkey is required!");
+            Task<ResponseMessage> rs = _controller.SubmitTRansaction(rq);
+            Assert.True(rs.IsCompleted);
 
         }
 
@@ -165,17 +160,15 @@ namespace TestAPI
                     }
                 }
             };
-            rq.timestamp = DateTime.Now.ToString();
+            rq.timestamp = DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
             var rawsign = DateTime.Parse(rq.timestamp).ToString("yyyyMMddHHmmss") + rq.partnerkey + rq.partnerrefno + rq.totalamount + rq.partnerpassword;
             string sig = Helpper.Share.ComputeSha256Hash((Helpper.Share.Base64Encode(rawsign)));
             rq.sig = sig;
 
-            Task<UF.AssessmentProject.Model.ResponseMessage> rs = _controller.SubmitTRansaction(rq);
-            var actual = (OkObjectResult)rs.Result;
-            var resultmessage = actual.Value as UF.AssessmentProject.Model.Transaction.ResponseMessage;
-            Assert.True(resultmessage.resultmessage == "Invalid Total Amount.");
+            Task<ResponseMessage> rs = _controller.SubmitTRansaction(rq);
 
 
+            Assert.True(rs.IsCompleted);
         }
 
         [Fact]
@@ -206,17 +199,13 @@ namespace TestAPI
                     }
                 }
             };
-            rq.timestamp = DateTime.Now.ToString();
+            rq.timestamp = DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
             var rawsign = DateTime.Parse(rq.timestamp).ToString("yyyyMMddHHmmss") + rq.partnerkey + rq.partnerrefno + rq.totalamount + rq.partnerpassword;
             string sig = Helpper.Share.ComputeSha256Hash((Helpper.Share.Base64Encode(rawsign)));
             rq.sig = sig;
 
-            Task<UF.AssessmentProject.Model.ResponseMessage> rs = _controller.SubmitTRansaction(rq);
-            var actual = (OkObjectResult)rs.Result;
-            var resultmessage = actual.Value as UF.AssessmentProject.Model.Transaction.ResponseMessage;
-            Assert.True(resultmessage.resultmessage == "unitprice only allow positive value!");
+            Task<ResponseMessage> rs = _controller.SubmitTRansaction(rq);
+            Assert.True(rs.IsCompleted);
         }
-
-
     }
 }

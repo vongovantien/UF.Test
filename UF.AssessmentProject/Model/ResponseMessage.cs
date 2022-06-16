@@ -22,15 +22,5 @@ namespace UF.AssessmentProject.Model
         /// <example>Success</example>
         [Required]
         public string resultmessage { get; set; }
-
-        public static implicit operator Task<object>(ResponseMessage v)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static explicit operator OkObjectResult(ResponseMessage v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

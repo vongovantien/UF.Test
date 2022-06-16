@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using UF.AssessmentProject.logs;
 using UF.AssessmentProject.Model;
 using UF.AssessmentProject.Services;
 
@@ -21,9 +22,9 @@ namespace UF.AssessmentProject.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly IMainRepository _repository;
-        private readonly ILogger _logger;
+        private readonly ILoggerManager _logger;
 
-        public TransactionController(IMainRepository repository, ILogger<TransactionController> logger)
+        public TransactionController(IMainRepository repository, ILoggerManager logger)
         {
             _repository = repository;
             _logger = logger;
